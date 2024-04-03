@@ -17,6 +17,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include "app_threadx.h"
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -92,14 +93,14 @@ int main(void)
 
   /* USER CODE END 2 */
 
+  MX_ThreadX_Init();
+
+  /* We should never get here as control is now taken by the scheduler */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    HAL_Delay(1000);
-    HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_4); // Yellow LED 토글
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0); // Green LED 토글
-    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_4); // Red LED 토글
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
