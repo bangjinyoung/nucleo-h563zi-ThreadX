@@ -97,9 +97,9 @@ void tx_app_thread_entry(ULONG thread_input)
 
   while (1) {
     tx_thread_sleep(100);
-    HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_4); // Yellow LED í† ê¸€
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0); // Green LED í† ê¸€
-    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_4); // Red LED í† ê¸€
+    HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_4); // Yellow LED ?† ê¸?
+    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0); // Green LED ?† ê¸?
+    HAL_GPIO_TogglePin(GPIOG, GPIO_PIN_4); // Red LED ?† ê¸?
   }
   /* USER CODE END tx_app_thread_entry */
 }

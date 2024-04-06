@@ -31,6 +31,8 @@
 #include "stm32h5xx_hal.h"
 #include "app_azure_rtos_config.h"
 
+#include "app_netxduo.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 

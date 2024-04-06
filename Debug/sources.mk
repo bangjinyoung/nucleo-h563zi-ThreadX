@@ -25,7 +25,13 @@ SUBDIRS := \
 AZURE_RTOS/App \
 Core/Src \
 Core/Startup \
+Drivers/BSP/Components/lan8742 \
 Drivers/STM32H5xx_HAL_Driver/Src \
+Middlewares/ST/netxduo/addons/dhcp \
+Middlewares/ST/netxduo/common/drivers/ethernet/lan8742 \
+Middlewares/ST/netxduo/common/drivers/ethernet \
+Middlewares/ST/netxduo/common/src \
 Middlewares/ST/threadx/common/src \
 Middlewares/ST/threadx/ports/cortex_m33/gnu/src \
+NetXDuo/App \
 
