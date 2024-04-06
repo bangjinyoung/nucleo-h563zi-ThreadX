@@ -136,9 +136,7 @@
 
 /* Defined, enables the optional debug packet dumping available in the RAM
    Ethernet network driver.  */
-/*
 #define NX_DEBUG_PACKET
-*/
 
 /* Defined, enables the optional print debug information available from the RAM
    Ethernet network driver. */
@@ -179,9 +177,7 @@
 */
 
 /* Defined, packet debug information is enabled.  */
-/*
 #define NX_ENABLE_PACKET_DEBUG_INFO
-*/
 
 /* If defined, the packet chain feature is removed. */
 /*

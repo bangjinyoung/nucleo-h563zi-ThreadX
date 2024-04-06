@@ -212,25 +212,25 @@ UINT MX_NetXDuo_Init(VOID *memory_ptr)
   /* USER CODE BEGIN MX_NetXDuo_Init */
 
   /* Allocate the memory for Link thread   */
-  if (tx_byte_allocate(byte_pool, (VOID **) &pointer, NX_APP_THREAD_STACK_SIZE * 2, TX_NO_WAIT) != TX_SUCCESS)
+  if (tx_byte_allocate(byte_pool, (VOID **) &pointer, NX_APP_THREAD_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
   {
     return TX_POOL_ERROR;
   }
 
   // /* create the Link thread */
   ret = tx_thread_create(&dhcp_link_trhead, "dhcp link thread", dhcp_link_thread_entry, 0, pointer, 
-                        NX_APP_THREAD_STACK_SIZE * 2, NX_APP_THREAD_PRIORITY + 1, NX_APP_THREAD_PRIORITY + 1 , 
+                        NX_APP_THREAD_STACK_SIZE, NX_APP_THREAD_PRIORITY + 1, NX_APP_THREAD_PRIORITY + 1 , 
                         TX_NO_TIME_SLICE, TX_AUTO_START);
 
   // /* Allocate the memory for main thread   */
-  if (tx_byte_allocate(byte_pool, (VOID **) &pointer, NX_APP_THREAD_STACK_SIZE * 2, TX_NO_WAIT) != TX_SUCCESS)
+  if (tx_byte_allocate(byte_pool, (VOID **) &pointer, NX_APP_THREAD_STACK_SIZE, TX_NO_WAIT) != TX_SUCCESS)
   {
     return TX_POOL_ERROR;
   }
 
   /* Create the main thread */
   ret = tx_thread_create(&udp_echo_server_thread, "udp echo server thread", udp_echo_server_thread_entry , 0, pointer, 
-                        NX_APP_THREAD_STACK_SIZE * 2, NX_APP_THREAD_PRIORITY, NX_APP_THREAD_PRIORITY, TX_NO_TIME_SLICE,
+                        NX_APP_THREAD_STACK_SIZE, NX_APP_THREAD_PRIORITY, NX_APP_THREAD_PRIORITY, TX_NO_TIME_SLICE,
                         TX_AUTO_START);
 
   /* Allocate the memory for Link thread   */
@@ -450,7 +450,7 @@ static VOID tcp_echo_server_thread_entry (ULONG thread_input)
 
   /* create the TCP socket */
   ret = nx_tcp_socket_create(&NetXDuoEthIpInstance, &TCPSocket, "TCP Server Socket", NX_IP_NORMAL, NX_FRAGMENT_OKAY,
-                             NX_IP_TIME_TO_LIVE, 100, NX_NULL, NX_NULL);
+                             NX_IP_TIME_TO_LIVE, 512, NX_NULL, NX_NULL);
   if (ret)
   {
     Error_Handler();
@@ -509,10 +509,8 @@ static VOID tcp_echo_server_thread_entry (ULONG thread_input)
         /* retrieve the data sent by the client */
         nx_packet_data_retrieve(data_packet, data_buffer, &bytes_read);
 
-        /* immediately resend the same packet */
+        // /* immediately resend the same packet */
         ret =  nx_tcp_socket_send(&TCPSocket, data_packet, NX_WAIT_FOREVER);
-
-        nx_packet_release(data_packet);
       }
       else
       {
@@ -528,3 +526,5 @@ static VOID tcp_echo_server_thread_entry (ULONG thread_input)
     }
   }
 }
+
+/* USER CODE END 1 */
