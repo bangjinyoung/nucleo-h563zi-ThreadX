@@ -2279,7 +2279,9 @@
    will function without any change if this option is defined. The HTTPS Server
    will need to either be modified or the user will have to create a handful of
    FileX services in order to function properly. */
+/*
 #define NX_WEB_HTTP_NO_FILEX
+*/
 
 /* The priority of the HTTPS Server thread. By default, this value is defined
    as 4 to specify priority 4. */

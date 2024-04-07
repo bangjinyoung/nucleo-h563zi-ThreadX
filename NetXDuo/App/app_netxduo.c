@@ -35,6 +35,12 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define DEFAULT_PORT 7
+
+#define SERVER_PACKET_SIZE         (1024 * 2)
+#define SERVER_POOL_SIZE           (SERVER_PACKET_SIZE * 8)
+#define HTTP_STACK_SIZE            2048
+#define IPERF_STACK_SIZE           2048
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -52,7 +58,11 @@ NX_DHCP        DHCPClient;
 ULONG ip_address;
 ULONG network_mask;
 NX_TCP_SOCKET TCPSocket;
-ULONG socket_state;
+
+NX_PACKET_POOL WebServerPool;
+UCHAR *http_stack;
+UCHAR *iperf_stack;
+static UCHAR nx_server_pool[SERVER_POOL_SIZE];
 
 TX_THREAD dhcp_link_trhead;
 TX_THREAD udp_echo_server_thread;
@@ -66,6 +76,7 @@ static VOID ip_address_change_notify_callback(NX_IP *ip_instance, VOID *ptr);
 static VOID dhcp_link_thread_entry (ULONG thread_input);
 static VOID udp_echo_server_thread_entry (ULONG thread_input);
 static VOID tcp_echo_server_thread_entry (ULONG thread_input);
+extern void nx_iperf_entry(NX_PACKET_POOL *pool_ptr, NX_IP *ip_ptr, UCHAR *http_stack, ULONG http_stack_size, UCHAR *iperf_stack, ULONG iperf_stack_size);
 /* USER CODE END PFP */
 
 /**
@@ -244,6 +255,40 @@ UINT MX_NetXDuo_Init(VOID *memory_ptr)
                         NX_APP_THREAD_STACK_SIZE * 2, NX_APP_THREAD_PRIORITY, NX_APP_THREAD_PRIORITY, 
                         TX_NO_TIME_SLICE, TX_DONT_START);
 
+  /* Create the server packet pool. */
+  ret = nx_packet_pool_create(&WebServerPool, "HTTP Server Packet Pool", SERVER_PACKET_SIZE, nx_server_pool, SERVER_POOL_SIZE);
+
+  /* Check for server pool creation status. */
+  if (ret != NX_SUCCESS)
+  {
+    printf("Server pool creation failed : 0x%02x\n", ret);
+    Error_Handler();
+  }
+
+  /* Set the server stack and IPerf stack.  */
+  /* Allocate the server stack. */
+  ret = tx_byte_allocate(byte_pool, (VOID **) &pointer, HTTP_STACK_SIZE, TX_NO_WAIT);
+
+  /* Check server stack memory allocation. */
+  if (ret != NX_SUCCESS)
+  {
+    printf("Server stack memory allocation failed : 0x%02x\n", ret);
+    Error_Handler();
+  }
+  http_stack = (UCHAR *)pointer;
+
+
+  /* Allocate the IPERF stack. */
+  ret = tx_byte_allocate(byte_pool, (VOID **) &pointer, IPERF_STACK_SIZE, TX_NO_WAIT);
+
+  /* Check IPERF stack memory allocation. */
+  if (ret != NX_SUCCESS)
+  {
+    printf("IPERF stack memory allocation failed : 0x%02x\n", ret);
+    Error_Handler();
+  }
+  iperf_stack = (UCHAR *)pointer;
+
   /* USER CODE END MX_NetXDuo_Init */
 
   return ret;
@@ -311,11 +356,14 @@ static VOID nx_app_thread_entry (ULONG thread_input)
   /* USER CODE BEGIN Nx_App_Thread_Entry 2 */
   nx_ip_address_get(&NetXDuoEthIpInstance, &ip_address, &network_mask);
 
+  nx_iperf_entry(&WebServerPool, &NetXDuoEthIpInstance, http_stack, HTTP_STACK_SIZE, iperf_stack, IPERF_STACK_SIZE);
+
   /* the network is correctly initialized, start the TCP server thread */
   tx_thread_resume(&tcp_echo_server_thread);
 
   /* this thread is not needed any more, we relinquish it */
   tx_thread_relinquish();
+
   return;
   /* USER CODE END Nx_App_Thread_Entry 2 */
 
